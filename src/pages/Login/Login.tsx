@@ -1,27 +1,43 @@
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
 import { app } from "../../../firebase";
 
 export function Login() {
+  const provider = new GoogleAuthProvider();
+
   const handleLogin = () => {
     const auth = getAuth(app);
-    signInAnonymously(auth)
-      .then((userCredential) => {
-        const { user } = userCredential;
-        console.log("Successfully signed in as:", user.uid);
+
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential?.accessToken;
+
+        // Can use the token to fetch the users data (when there is data to fetch)
+
+        console.log("Successfully signed in with Google. User ID:", user.uid);
       })
       .catch((error) => {
-        console.error("Anonymous sign-in failed:", error.code, error.message);
+        const errorCode = error.code;
+        const errorMessage = error.message;
+
+        console.error("Google sign-in failed:", errorCode, errorMessage);
+
+        if (error.customData && error.customData.email) {
+          console.error("Email used:", error.customData.email);
+        }
       });
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center">
+    <main className="flex min-h-screen items-center justify-center flex-col gap-4">
+      <h1 className="text-2xl">Welcome to Bogey Buddy</h1>
       <button
         onClick={handleLogin}
         className="mt-4 px-4 py-2 bg-blue-500 text-white rounded"
       >
-        Sign In
+        Sign In with Google
       </button>
     </main>
   );
