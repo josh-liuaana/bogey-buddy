@@ -1,16 +1,39 @@
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { Home } from "./pages/Home/";
-import { Login } from "./pages/Login/";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom"; // 👈 Import Routes/Route/Outlet
 
-function AppContent() {
+import { useAuth } from "./contexts/AuthContext";
+import { Home } from "./pages/Home";
+import { Login } from "./pages/Login";
+import { Profile } from "./pages/Profile";
+import { Statistics } from "./pages/Statistics";
+
+function PrivateRoute() {
+  const { user, loading } = useAuth();
+  if (loading)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    ); //spinner
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
+function PublicRoute() {
   const { user } = useAuth();
-  return <div>{user ? <Home /> : <Login />}</div>;
+  return user ? <Navigate to="/" replace /> : <Outlet />;
 }
 
 export function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Routes>
+      <Route element={<PublicRoute />}>
+        <Route path="/login" element={<Login />} />
+      </Route>
+
+      <Route element={<PrivateRoute />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/statistics" element={<Statistics />} />
+      </Route>
+    </Routes>
   );
 }

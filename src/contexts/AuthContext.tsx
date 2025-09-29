@@ -5,12 +5,14 @@ import { app } from "../../firebase";
 
 interface AuthContextType {
   user: User | null;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const auth = getAuth(app);
 
   useEffect(() => {
@@ -18,6 +20,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // (e.g., login, logout, etc.)
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       setUser(authUser);
+      setLoading(false);
     });
 
     // Clean up the listener when the component unmounts
@@ -25,7 +28,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [auth]);
 
   return (
-    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ user, loading }}>
+      {children}
+    </AuthContext.Provider>
   );
 }
 
