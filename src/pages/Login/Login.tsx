@@ -10,7 +10,7 @@ export function Login() {
 
     signInWithPopup(auth, provider)
       .then((result) => {
-        const user = result.user;
+        const { user } = result;
         // const credential = GoogleAuthProvider.credentialFromResult(result);
         // const token = credential?.accessToken;
 
