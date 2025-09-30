@@ -1,10 +1,11 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"; // 👈 Import Routes/Route/Outlet
 
-import { useAuth } from "./contexts/AuthContext";
-import { Home } from "./pages/Home";
-import { Login } from "./pages/Login";
-import { Profile } from "./pages/Profile";
-import { Statistics } from "./pages/Statistics";
+import { useAuth } from "@/contexts/AuthContext";
+import { Home } from "@/pages/Home";
+import { Login } from "@/pages/Login";
+import { Profile } from "@/pages/Profile";
+import { Statistics } from "@/pages/Statistics";
+import { Navbar } from "@/components/Navbar";
 
 function PrivateRoute() {
   const { user, loading } = useAuth();
@@ -14,7 +15,14 @@ function PrivateRoute() {
         Loading...
       </div>
     ); //spinner
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return user ? (
+    <>
+      <Navbar />
+      <Outlet />
+    </>
+  ) : (
+    <Navigate to="/login" replace />
+  );
 }
 
 function PublicRoute() {
