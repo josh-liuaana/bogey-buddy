@@ -1,11 +1,11 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom"; // 👈 Import Routes/Route/Outlet
 
+import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { Home } from "@/pages/Home";
 import { Login } from "@/pages/Login";
 import { Profile } from "@/pages/Profile";
 import { Statistics } from "@/pages/Statistics";
-import { Navbar } from "@/components/Navbar";
 
 function PrivateRoute() {
   const { user, loading } = useAuth();

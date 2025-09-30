@@ -1,9 +1,10 @@
-import { useNavigate } from "react-router-dom";
-import ExpandableDock from "@/components/ui/expandable-dock";
 import { getAuth, signOut } from "firebase/auth";
-import { TiThMenu } from "react-icons/ti";
-import { IoAnalytics, IoHome, IoLogOutOutline } from "react-icons/io5";
 import { FaRegUser } from "react-icons/fa";
+import { IoAnalytics, IoHome, IoLogOutOutline } from "react-icons/io5";
+import { TiThMenu } from "react-icons/ti";
+import { useNavigate } from "react-router-dom";
+
+import { ExpandableDock } from "@/components/ui/expandable-dock";
 
 import { app } from "../../../firebase";
 

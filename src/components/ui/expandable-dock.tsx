@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ReactNode, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
+import { type ReactNode, useEffect, useRef, useState } from "react";
+
 import { cn } from "../../lib/utils";
 
 interface ExpandableDockProps {
@@ -10,7 +11,7 @@ interface ExpandableDockProps {
   className?: string;
 }
 
-const ExpandableDock = ({
+export const ExpandableDock = ({
   headerContent,
   children,
   className,
@@ -112,5 +113,3 @@ const ExpandableDock = ({
     </div>
   );
 };
-
-export default ExpandableDock;
