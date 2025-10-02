@@ -6,12 +6,15 @@ import { BrowserRouter } from "react-router-dom";
 
 import { App } from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
+import { CourseProvider } from "./contexts/CourseContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <App />
+        <CourseProvider>
+          <App />
+        </CourseProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
