@@ -7,15 +7,18 @@ import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { CourseProvider } from "./contexts/CourseContext.tsx";
+import { RoundProvider } from "./contexts/RoundContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <CourseProvider>
-          <App />
+          <RoundProvider>
+            <App />
+          </RoundProvider>
         </CourseProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 );

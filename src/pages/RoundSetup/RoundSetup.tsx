@@ -11,15 +11,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCourse } from "@/contexts/CourseContext";
+import { useNavigate } from "react-router-dom";
+import { useRound } from "@/contexts/RoundContext";
 
 export function RoundSetup() {
   const { selectedCourse, setSelectedCourse, courseList } = useCourse();
-  const [roundType, setRoundType] = useState("playing-live");
+  const [roundType, setRoundType] = useState<"playing-live" | "previous-entry">(
+    "playing-live"
+  );
+  const { startRound } = useRound();
+  const navigate = useNavigate();
 
   const handlePlay = () => {
-    // TODO: Navigate to the round page with the selected course and round type for user interaction
-    // -> Will need to implement a data context and some form of local storage to persist data
+    // -> Will need to implement some form of local storage to persist data in case of a refresh
     alert(`Starting round on course ID: ${selectedCourse}`);
+    if (!selectedCourse) {
+      alert("No course selected");
+      return;
+    }
+    startRound({ course: selectedCourse, roundType });
+    navigate("/current-round");
   };
 
   return (
@@ -29,7 +40,7 @@ export function RoundSetup() {
 
       <RadioGroup
         value={roundType}
-        onValueChange={setRoundType}
+        onValueChange={(value) => setRoundType(value as typeof roundType)}
         defaultValue="playing-live"
         className="flex flex-col space-x-4"
       >
@@ -44,7 +55,12 @@ export function RoundSetup() {
       </RadioGroup>
       <div>
         <Label className="">Course Selection</Label>
-        <Select onValueChange={setSelectedCourse}>
+        <Select
+          onValueChange={(id) => {
+            const course = courseList?.find((c) => c.id === id) || null;
+            setSelectedCourse(course);
+          }}
+        >
           <SelectTrigger className="">
             <SelectValue placeholder="Select a Course" />
           </SelectTrigger>
@@ -56,16 +72,7 @@ export function RoundSetup() {
             ))}
           </SelectContent>
         </Select>
-        <Button
-          onClick={() => {
-            if (selectedCourse) {
-              handlePlay();
-            } else {
-              alert("Please select a course");
-            }
-          }}
-          className=""
-        >
+        <Button onClick={handlePlay} className="">
           Play
         </Button>
       </div>

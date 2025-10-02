@@ -7,6 +7,7 @@ import { Login } from "@/pages/Login";
 import { Profile } from "@/pages/Profile";
 import { RoundSetup } from "@/pages/RoundSetup";
 import { Statistics } from "@/pages/Statistics";
+import { CurrentRound } from "./pages/CurrentRound";
 
 function PrivateRoute() {
   const { user, loading } = useAuth();
@@ -43,6 +44,7 @@ export function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/round-setup" element={<RoundSetup />} />
+        <Route path="/current-round" element={<CurrentRound />} />
       </Route>
     </Routes>
   );

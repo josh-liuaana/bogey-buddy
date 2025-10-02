@@ -11,15 +11,17 @@ import type { Course, CourseWithId } from "@/types/course";
 import { db } from "../../firebase";
 
 interface CourseContextType {
-  selectedCourse: string | null;
-  setSelectedCourse: (course: string) => void;
+  selectedCourse: CourseWithId | null;
+  setSelectedCourse: (course: CourseWithId | null) => void;
   courseList: CourseWithId[] | null;
 }
 
 const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
 export function CourseProvider({ children }: { children: React.ReactNode }) {
-  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<CourseWithId | null>(
+    null
+  );
   const [courseList, setCourseList] = useState<CourseWithId[] | null>(null);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
             id: doc.id,
             ...data,
           };
-        },
+        }
       );
       setCourseList(rawCourseList);
     };
