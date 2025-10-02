@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Home } from "@/pages/Home";
 import { Login } from "@/pages/Login";
 import { Profile } from "@/pages/Profile";
+import { RoundSetup } from "@/pages/RoundSetup";
 import { Statistics } from "@/pages/Statistics";
 
 function PrivateRoute() {
@@ -41,6 +42,7 @@ export function App() {
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/statistics" element={<Statistics />} />
+        <Route path="/round-setup" element={<RoundSetup />} />
       </Route>
     </Routes>
   );
