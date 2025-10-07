@@ -20,7 +20,7 @@ const CourseContext = createContext<CourseContextType | undefined>(undefined);
 
 export function CourseProvider({ children }: { children: React.ReactNode }) {
   const [selectedCourse, setSelectedCourse] = useState<CourseWithId | null>(
-    null
+    null,
   );
   const [courseList, setCourseList] = useState<CourseWithId[] | null>(null);
 
@@ -39,7 +39,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
             id: doc.id,
             ...data,
           };
-        }
+        },
       );
       setCourseList(rawCourseList);
     };

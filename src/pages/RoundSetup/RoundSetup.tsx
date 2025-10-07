@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -11,25 +12,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useCourse } from "@/contexts/CourseContext";
-import { useNavigate } from "react-router-dom";
 import { useRound } from "@/contexts/RoundContext";
 
 export function RoundSetup() {
   const { selectedCourse, setSelectedCourse, courseList } = useCourse();
   const [roundType, setRoundType] = useState<"playing-live" | "previous-entry">(
-    "playing-live"
+    "playing-live",
   );
   const { startRound } = useRound();
   const navigate = useNavigate();
 
   const handlePlay = () => {
     // -> Will need to implement some form of local storage to persist data in case of a refresh
-    alert(`Starting round on course ID: ${selectedCourse}`);
     if (!selectedCourse) {
       alert("No course selected");
       return;
     }
-    startRound({ course: selectedCourse, roundType });
+    startRound({
+      course: selectedCourse,
+      roundType,
+    });
     navigate("/current-round");
   };
 

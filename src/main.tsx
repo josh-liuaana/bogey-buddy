@@ -20,5 +20,5 @@ createRoot(document.getElementById("root")!).render(
         </CourseProvider>
       </AuthProvider>
     </BrowserRouter>
-  </StrictMode>
+  </StrictMode>,
 );
