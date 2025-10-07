@@ -1,13 +1,13 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom"; // 👈 Import Routes/Route/Outlet
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
+import { CurrentRound } from "@/pages/CurrentRound";
 import { Home } from "@/pages/Home";
 import { Login } from "@/pages/Login";
 import { Profile } from "@/pages/Profile";
 import { RoundSetup } from "@/pages/RoundSetup";
 import { Statistics } from "@/pages/Statistics";
-import { CurrentRound } from "./pages/CurrentRound";
 
 function PrivateRoute() {
   const { user, loading } = useAuth();
@@ -16,7 +16,7 @@ function PrivateRoute() {
       <div className="h-screen flex items-center justify-center">
         Loading...
       </div>
-    ); //spinner
+    );
   return user ? (
     <>
       <Navbar />

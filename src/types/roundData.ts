@@ -1,3 +1,4 @@
+// Stores a full round of golf, including all holes and shots taken
 export type RoundData = {
   userId: string;
   courseId: string;
@@ -11,7 +12,8 @@ export type RoundData = {
   greensInRegulation: number;
 };
 
-type HoleData = {
+// Data for each hole played in the round
+export type HoleData = {
   holeNumber: number;
   par: number;
   strokes: number;
@@ -22,7 +24,8 @@ type HoleData = {
   shots: ShotInformation[];
 };
 
-type ShotInformation = {
+// Data for each shot taken during a hole
+export type ShotInformation = {
   shotNumber: number;
   shotCategory: "standard" | "putt";
   shotType: ShotType;
@@ -34,63 +37,108 @@ type ShotInformation = {
   intendedShotResult: IntendedShotData;
 };
 
-type ShotData = StandardShot | Putt;
-type IntendedShotData = BaseStandardShot | BasePutt;
+export type ShotData = StandardShot | Putt;
+export type IntendedShotData = BaseStandardShot | BasePutt;
 
-type ShotType = "Tee Shot" | "Full Shot" | "Approach Shot" | "Putt";
-type LieCondition = "Tee" | "Fairway" | "Rough" | "Bunker" | "Green";
-type ResultCondition =
-  | "Fairway"
-  | "Rough"
-  | "Bunker"
-  | "Green"
-  | "Hole Out"
-  | "Water"
-  | "Out of Bounds"
-  | "Hazard";
+// Shot Categories and Types
+
+export const shotTypes = [
+  "Tee Shot",
+  "Full Shot",
+  "Approach Shot",
+  "Putt",
+] as const;
+
+export const lieConditions = [
+  "Tee",
+  "Fairway",
+  "Rough",
+  "Bunker",
+  "Green",
+] as const;
+
+export const resultConditions = [
+  "Fairway",
+  "Rough",
+  "Bunker",
+  "Green",
+  "Hole Out",
+  "Water",
+  "Out of Bounds",
+  "Hazard",
+] as const;
+
+export type ShotType = (typeof shotTypes)[number];
+export type LieCondition = (typeof lieConditions)[number];
+export type ResultCondition = (typeof resultConditions)[number];
+
+// * Non-putts
+
+export interface BaseStandardShot {
+  ballFlight: BallFlight;
+  ballShape: BallShape;
+  swingType: SwingType;
+  elevationChange: ElevationChange;
+}
+
+export interface StandardShot extends BaseStandardShot {
+  distanceToTarget: DistanceToTarget;
+  directionToTarget: DirectionToTarget;
+}
 
 // * Putts
 
-interface BasePutt {
+export interface BasePutt {
   read: Read;
   pace: Pace;
 }
 
-interface Putt extends BasePutt {
+export interface Putt extends BasePutt {
   distanceToTarget: DistanceToTarget;
+  directionToTarget: DirectionToTarget;
   missSide: MissSide;
-  breakRead: BreakRead;
-  directionToTarget: DirectionToTarget;
 }
 
-// * Non-putts
+// * Specific shot attributes * //
 
-interface BaseStandardShot {
-  ballFlight: BallFlight;
-  ballShape: ballShape;
-  swingType: SwingType;
-}
+// * Common attributes
 
-interface StandardShot extends BaseStandardShot {
-  distanceToTarget: DistanceToTarget;
-  directionToTarget: DirectionToTarget;
-  elevationChange: ElevationChange;
-}
+export const distanceToTargets = ["Short", "On Target", "Long"] as const;
+export const directionToTargets = ["Left", "Straight", "Right"] as const;
 
-type Read = "Break Left" | "Break Right" | "Straight";
-type Pace = "Uphill" | "Downhill" | "Flat";
-type DistanceToTarget = "Short" | "Long" | "On Target";
-type DirectionToTarget = "Left" | "Right" | "Straight";
-type ElevationChange = "Up" | "Down" | "Level";
-type MissSide = "High" | "Low";
-type BreakRead = "Over Read" | "Under Read" | "On Read";
-type SwingType =
-  | "Normal"
-  | "Punch"
-  | "Pitch"
-  | "Chip"
-  | "Flop"
-  | "Lob"
-  | "Bump and Run";
-type BallFlight = "Low" | "Standard" | "High";
-type ballShape = "Fade" | "Draw" | "Straight" | "Slice" | "Hook";
+export type DistanceToTarget = (typeof distanceToTargets)[number];
+export type DirectionToTarget = (typeof directionToTargets)[number];
+
+// * Standard shots
+
+export const ballFlights = ["Low", "Standard", "High"] as const;
+export const ballShapes = ["Draw", "Straight", "Fade"] as const;
+export const swingTypes = [
+  "Normal",
+  "Punch",
+  "Pitch",
+  "Chip",
+  "Flop",
+  "Lob",
+  "Bump and Run",
+] as const;
+export const elevationChanges = ["Up", "Level", "Down"] as const;
+
+type BallFlight = (typeof ballFlights)[number];
+type BallShape = (typeof ballShapes)[number];
+type SwingType = (typeof swingTypes)[number];
+type ElevationChange = (typeof elevationChanges)[number];
+
+// * putt specific intended attributes
+
+export const reads = ["Break Left", "Straight", "Break Right"] as const;
+export const paces = ["Uphill", "Flat", "Downhill"] as const;
+
+export type Read = (typeof reads)[number];
+export type Pace = (typeof paces)[number];
+
+// * putt specific actual attributes
+
+export const missSides = ["Low", "On Read", "High"] as const;
+
+export type MissSide = (typeof missSides)[number];

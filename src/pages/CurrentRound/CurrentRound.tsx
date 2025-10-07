@@ -1,3 +1,5 @@
+import { CurrentHole } from "@/components/CurrentHole";
+import { Button } from "@/components/ui/button";
 import { useRound } from "@/contexts/RoundContext";
 
 export function CurrentRound() {
@@ -8,11 +10,11 @@ export function CurrentRound() {
   }
 
   return (
-    <div>
+    <div className="m-2">
       <h1>Current Round</h1>
       <p>Course: {currentRound.course.title}</p>
-      <p>Type: {currentRound.roundType}</p>
-      {/* <button onClick={endRound}>End Round</button> */}
+      <CurrentHole />
+      <Button onClick={endRound}>End Round</Button>
     </div>
   );
 }
