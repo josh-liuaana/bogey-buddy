@@ -1,5 +1,6 @@
 import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+import { log } from "@/utils/logger";
 
 import { app } from "../../firebase";
 
@@ -16,15 +17,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const auth = getAuth(app);
 
   useEffect(() => {
-    // This listener automatically detects auth state changes
-    // (e.g., login, logout, etc.)
+    log("AuthProvider", "Checking for valid user...");
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        log("AuthProvider", "User found:", { email: authUser.email });
+      } else {
+        log("AuthProvider", "No user logged in");
+      }
       setUser(authUser);
       setLoading(false);
+      log("AuthProvider", "Finished checking for user");
     });
 
     // Clean up the listener when the component unmounts
-    return () => unsubscribe();
+    return () => {
+      log("AuthProvider", "Cleaning up auth listener");
+      unsubscribe();
+    };
   }, [auth]);
 
   return (

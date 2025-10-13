@@ -1,5 +1,6 @@
 import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 
+import { AuthGate } from "@/components/AuthGate";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
 import { CurrentRound } from "@/pages/CurrentRound";
@@ -9,37 +10,61 @@ import { Profile } from "@/pages/Profile";
 import { RoundSetup } from "@/pages/RoundSetup";
 import { Statistics } from "@/pages/Statistics";
 
+import { log } from "./utils/logger";
+
 function PrivateRoute() {
-  const { user, loading } = useAuth();
-  if (loading)
-    return (
-      <div className="h-screen flex items-center justify-center">
-        Loading...
-      </div>
-    );
-  return user ? (
+  const { user } = useAuth();
+
+  log("PrivateRoute", "Checking access", { hasUser: !user });
+
+  if (!user) {
+    log("PrivateRoute", "No user — redirecting to /login");
+    return <Navigate to="/login" replace />;
+  }
+
+  log("PrivateRoute", "User verified — rendering private routes");
+  return (
     <>
       <Navbar />
       <Outlet />
     </>
-  ) : (
-    <Navigate to="/login" replace />
   );
 }
 
 function PublicRoute() {
   const { user } = useAuth();
-  return user ? <Navigate to="/" replace /> : <Outlet />;
+
+  log("PublicRoute", "Checking if user already logged in", { hasUser: !!user });
+
+  if (user) {
+    log("PublicRoute", "Redirecting authenticated user to /");
+    return <Navigate to="/" replace />;
+  }
+
+  log("PublicRoute", "No user — showing public route");
+  return <Outlet />;
 }
 
 export function App() {
   return (
     <Routes>
-      <Route element={<PublicRoute />}>
+      <Route
+        element={
+          <AuthGate>
+            <PublicRoute />
+          </AuthGate>
+        }
+      >
         <Route path="/login" element={<Login />} />
       </Route>
 
-      <Route element={<PrivateRoute />}>
+      <Route
+        element={
+          <AuthGate>
+            <PrivateRoute />
+          </AuthGate>
+        }
+      >
         <Route path="/" element={<Home />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/statistics" element={<Statistics />} />
