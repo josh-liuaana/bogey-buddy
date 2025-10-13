@@ -15,7 +15,7 @@ import { log } from "./utils/logger";
 function PrivateRoute() {
   const { user } = useAuth();
 
-  log("PrivateRoute", "Checking access", { hasUser: !user });
+  log("PrivateRoute", "Checking access", { hasUser: !!user });
 
   if (!user) {
     log("PrivateRoute", "No user — redirecting to /login");
