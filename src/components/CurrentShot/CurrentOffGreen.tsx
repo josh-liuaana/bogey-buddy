@@ -119,7 +119,7 @@ export function CurrentOffGreen() {
           <Label>Elevation Change</Label>
           <Select
             onValueChange={(value) =>
-              handleInputChange("elevationChange", value)
+              handleIntendedShotChange("elevationChange", value)
             }
           >
             <SelectTrigger>

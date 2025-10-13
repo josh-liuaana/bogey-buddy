@@ -21,7 +21,7 @@ import { CurrentOnGreen } from "./CurrentOnGreen";
 export function CurrentShot() {
   const [club, setClub] = useState<Club | undefined>(undefined);
   const [distanceToHole, setDistanceToHole] = useState(0);
-  const { updateShotData, currentShotIndex } = useRound();
+  const { updateShotData, currentShotIndex, finishShot } = useRound();
 
   useEffect(() => {
     const shotCategory = club === "Putter" ? "putt" : "standard";
@@ -62,6 +62,7 @@ export function CurrentShot() {
             </SelectContent>
           </Select>
         </div>
+
         {/* Distance to Hole */}
         <div className="space-y-2  w-1/2">
           <Label htmlFor="distance">Distance to Hole</Label>
@@ -79,16 +80,7 @@ export function CurrentShot() {
       </div>
       {club && (club === "Putter" ? <CurrentOnGreen /> : <CurrentOffGreen />)}
 
-      <Button
-        onClick={() =>
-          updateShotData({
-            club,
-            shotCategory: club === "Putter" ? "putt" : "standard",
-          })
-        }
-      >
-        Save Shot
-      </Button>
+      <Button onClick={() => finishShot()}>Save Shot</Button>
     </div>
   );
 }

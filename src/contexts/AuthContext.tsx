@@ -1,5 +1,6 @@
 import { getAuth, onAuthStateChanged, type User } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
+
 import { log } from "@/utils/logger";
 
 import { app } from "../../firebase";

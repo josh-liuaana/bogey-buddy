@@ -124,10 +124,10 @@ export const swingTypes = [
 ] as const;
 export const elevationChanges = ["Up", "Level", "Down"] as const;
 
-type BallFlight = (typeof ballFlights)[number];
-type BallShape = (typeof ballShapes)[number];
-type SwingType = (typeof swingTypes)[number];
-type ElevationChange = (typeof elevationChanges)[number];
+export type BallFlight = (typeof ballFlights)[number];
+export type BallShape = (typeof ballShapes)[number];
+export type SwingType = (typeof swingTypes)[number];
+export type ElevationChange = (typeof elevationChanges)[number];
 
 // * putt specific intended attributes
 

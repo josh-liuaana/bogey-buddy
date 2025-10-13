@@ -9,7 +9,6 @@ import {
 
 import type { CourseWithId } from "@/types/course";
 import {
-  type HoleData,
   type IntendedShotData,
   type LieCondition,
   type ResultCondition,
@@ -18,8 +17,12 @@ import {
   type ShotInformation,
   type ShotType,
 } from "@/types/roundData";
+import { log } from "@/utils/logger";
 
-import { getDateAndTimeStrings } from "./roundContextHelpers";
+import {
+  getDateAndTimeStrings,
+  normaliseShotData,
+} from "./roundContextHelpers";
 
 type RoundType = "playing-live" | "previous-entry";
 
@@ -29,36 +32,33 @@ type CurrentRound = {
 };
 
 type RoundContextType = {
+  // * context state
   currentRound: CurrentRound | null;
+  roundData: RoundData | undefined;
+  shotInformation: ShotInformation;
+  currentHoleIndex: number;
+  currentShotIndex: number;
+
+  // * context functions * //
+
+  // * round functions
   startRound: (round: CurrentRound) => void;
   endRound: () => void;
-  roundData: RoundData;
-  holeData: HoleData[];
-  currentHoleIndex: number;
-  setCurrentHoleIndex: (index: number) => void;
-  currentShotIndex: number;
-  setCurrentShotIndex: (index: number) => void;
   updateRoundAggregates: () => void;
-  updateShotData: (shotInformation: Partial<ShotInformation>) => void;
-  createNewShot: () => void;
+
+  // * hole functions
+  initializeHole: (holeNumber: number) => void;
+  setCurrentHoleIndex: (index: number) => void;
   finishHole: () => void;
-  shotInformation: ShotInformation;
+
+  // * shot functions
+  createNewShot: () => void;
+  updateShotData: (shotInformation: Partial<ShotInformation>) => void;
+  setCurrentShotIndex: (index: number) => void;
+  finishShot: () => void;
 };
 
 const RoundContext = createContext<RoundContextType | undefined>(undefined);
-
-const initialRoundData: RoundData = {
-  userId: getAuth().currentUser?.uid ?? "",
-  courseId: "",
-  roundDate: "",
-  roundTime: "",
-  holes: [],
-  totalScore: 0,
-  totalPutts: 0,
-  totalPenaltyStrokes: 0,
-  fairwaysHit: 0,
-  greensInRegulation: 0,
-};
 
 function defaultShotInformation(shotNumber = 1): ShotInformation {
   return {
@@ -95,7 +95,7 @@ function defaultShotInformation(shotNumber = 1): ShotInformation {
 
 export function RoundProvider({ children }: { children: ReactNode }) {
   const [currentRound, setCurrentRound] = useState<CurrentRound | null>(null);
-  const [roundData, setRoundData] = useState<RoundData>(initialRoundData);
+  const [roundData, setRoundData] = useState<RoundData | undefined>(undefined);
   const [currentHoleIndex, setCurrentHoleIndex] = useState(0);
   const [currentShotIndex, setCurrentShotIndex] = useState(0);
   const [shotInformation, setShotInformation] = useState<ShotInformation>(
@@ -105,6 +105,8 @@ export function RoundProvider({ children }: { children: ReactNode }) {
   // ** ROUND-LEVEL FUNCTIONS ** //
 
   const startRound = (round: CurrentRound) => {
+    log("RoundProvider", "Initialising new round:", round.course.title);
+
     setRoundData({
       userId: getAuth().currentUser?.uid ?? "",
       courseId: round.course.id,
@@ -118,9 +120,8 @@ export function RoundProvider({ children }: { children: ReactNode }) {
       greensInRegulation: 0,
     });
     setCurrentRound(round);
-    setCurrentHoleIndex(1);
-    setCurrentShotIndex(0);
-    createNewShot();
+
+    initializeHole(1);
   };
 
   const updateRoundAggregates = () => {
@@ -134,6 +135,36 @@ export function RoundProvider({ children }: { children: ReactNode }) {
   };
 
   // ** HOLE-LEVEL FUNCTIONS ** //
+  const initializeHole = (holeNumber: number) => {
+    log("RoundProvider", "Initialising hole number:", holeNumber);
+
+    const holeData = {
+      holeNumber: holeNumber,
+      par: 4,
+      strokes: 0,
+      fairwayHit: null,
+      putts: 0,
+      penaltyStrokes: 0,
+      greenInRegulation: false,
+      shots: [] as ShotInformation[],
+    };
+
+    setCurrentHoleIndex(holeNumber);
+    setCurrentShotIndex(0);
+
+    setRoundData((prev) => {
+      if (!prev) return prev;
+      const updatedHoles = [...prev.holes];
+      updatedHoles[holeNumber - 1] = holeData;
+      return {
+        ...prev,
+        holes: updatedHoles,
+      };
+    });
+
+    createNewShot();
+  };
+
   const finishHole = () => {
     // TODO Finalize current hole data, update round aggregates, and prepare for next hole
     // push hole information into roundData.holes
@@ -146,7 +177,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
   // ** SHOT-LEVEL FUNCTIONS ** //
 
   const createNewShot = () => {
-    console.log("Creating new shot...");
+    log("RoundProvider", "Initialising new shot:", currentShotIndex + 1);
     setCurrentShotIndex((prev) => {
       const next = prev + 1;
       setShotInformation(defaultShotInformation(next));
@@ -177,23 +208,53 @@ export function RoundProvider({ children }: { children: ReactNode }) {
     [setShotInformation],
   );
 
+  const finishShot = () => {
+    // TODO Finalize current shot data, update hole data, and prepare for next shot - reset shotInformation to defaults
+
+    console.log("Finishing shot:", shotInformation);
+    const validatedShot = normaliseShotData(shotInformation);
+    console.log("Validated shot data:", validatedShot);
+    // push shot into current hole in roundData
+    // ! need to strip back logic flow
+    setRoundData((prev) => {
+      if (!prev) return prev;
+      const updatedHoles = [...prev.holes];
+      const holeIndex = currentHoleIndex - 1;
+
+      updatedHoles[holeIndex].shots.push(validatedShot);
+      updatedHoles[holeIndex].strokes += 1; // Increment strokes, can be adjusted for penalties
+
+      return {
+        ...prev,
+        holes: updatedHoles,
+      };
+    });
+    // prepare for next shot
+
+    createNewShot();
+  };
+
   return (
     <RoundContext.Provider
       value={{
         currentRound,
+        roundData,
+        shotInformation,
+        currentHoleIndex,
+        currentShotIndex,
+
         startRound,
         endRound,
-        roundData,
-        holeData: [],
-        currentHoleIndex: currentHoleIndex,
-        setCurrentHoleIndex: () => {},
-        currentShotIndex: currentShotIndex,
-        setCurrentShotIndex: () => {},
-        updateRoundAggregates: () => {},
-        updateShotData,
-        createNewShot,
+        updateRoundAggregates,
+
+        initializeHole,
+        setCurrentHoleIndex,
         finishHole,
-        shotInformation,
+
+        createNewShot,
+        updateShotData,
+        setCurrentShotIndex,
+        finishShot,
       }}
     >
       {children}

@@ -7,8 +7,10 @@ import {
 import { createContext, useContext, useEffect, useState } from "react";
 
 import type { Course, CourseWithId } from "@/types/course";
+import { log } from "@/utils/logger";
 
 import { db } from "../../firebase";
+import { useAuth } from "./AuthContext";
 
 interface CourseContextType {
   selectedCourse: CourseWithId | null;
@@ -23,11 +25,17 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
     null,
   );
   const [courseList, setCourseList] = useState<CourseWithId[] | null>(null);
-
+  const { user, loading } = useAuth();
   useEffect(() => {
+    if (!user) {
+      setCourseList(null);
+      return;
+    }
+    if (loading) return;
+
     // Fetch courses from Firestore
     const fetchCourses = async () => {
-      console.log("Fetching courses...");
+      log("CourseProvider", "Fetching courses...");
 
       const coursesCollection = collection(db, "courses");
       const courseSnapshot = await getDocs(coursesCollection);
@@ -44,7 +52,7 @@ export function CourseProvider({ children }: { children: React.ReactNode }) {
       setCourseList(rawCourseList);
     };
     fetchCourses();
-  }, []);
+  }, [user, loading]);
 
   return (
     <CourseContext.Provider

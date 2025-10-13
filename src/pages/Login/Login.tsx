@@ -1,5 +1,7 @@
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 
+import { log } from "@/utils/logger";
+
 import { app } from "../../../firebase";
 
 export function Login() {
@@ -16,7 +18,7 @@ export function Login() {
 
         // Can use the token to fetch the users data (when there is data to fetch)
 
-        console.log("Successfully signed in with Google. User ID:", user.uid);
+        log("", "Successfully signed in with Google. User ID:", user.uid);
       })
       .catch((error) => {
         const errorCode = error.code;
