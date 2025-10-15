@@ -52,7 +52,7 @@ type RoundContextType = {
   finishHole: () => void;
 
   // * shot functions
-  createNewShot: () => void;
+  createNewShot: (isFirstHoleShot: boolean) => void;
   updateShotData: (shotInformation: Partial<ShotInformation>) => void;
   setCurrentShotIndex: (index: number) => void;
   finishShot: () => void;
@@ -65,7 +65,7 @@ function defaultShotInformation(shotNumber = 1): ShotInformation {
     shotNumber,
     shotCategory: "standard",
     shotType: "" as ShotType,
-    club: "",
+    club: undefined as unknown as string,
     distanceToHole: 0,
     lieCondition: "" as unknown as LieCondition,
     result: "" as unknown as ResultCondition,
@@ -149,9 +149,6 @@ export function RoundProvider({ children }: { children: ReactNode }) {
       shots: [] as ShotInformation[],
     };
 
-    setCurrentHoleIndex(holeNumber);
-    setCurrentShotIndex(0);
-
     setRoundData((prev) => {
       if (!prev) return prev;
       const updatedHoles = [...prev.holes];
@@ -162,22 +159,28 @@ export function RoundProvider({ children }: { children: ReactNode }) {
       };
     });
 
-    createNewShot();
+    setCurrentHoleIndex(holeNumber);
+    createNewShot(true);
+    setCurrentShotIndex(1);
   };
 
   const finishHole = () => {
-    // TODO Finalize current hole data, update round aggregates, and prepare for next hole
-    // push hole information into roundData.holes
+    log("RoundProvider", "Finishing hole number:", currentHoleIndex);
+    finishShot();
+
     updateRoundAggregates();
-    setCurrentHoleIndex((prev) => prev + 1);
-    setCurrentShotIndex(0);
-    createNewShot();
+    initializeHole(currentHoleIndex + 1);
   };
 
   // ** SHOT-LEVEL FUNCTIONS ** //
 
-  const createNewShot = () => {
+  const createNewShot = (isFirstHoleShot: boolean) => {
     log("RoundProvider", "Initialising new shot:", currentShotIndex + 1);
+    if (isFirstHoleShot) {
+      setCurrentShotIndex(1);
+      setShotInformation(defaultShotInformation(1));
+      return;
+    }
     setCurrentShotIndex((prev) => {
       const next = prev + 1;
       setShotInformation(defaultShotInformation(next));
@@ -209,29 +212,26 @@ export function RoundProvider({ children }: { children: ReactNode }) {
   );
 
   const finishShot = () => {
-    // TODO Finalize current shot data, update hole data, and prepare for next shot - reset shotInformation to defaults
-
-    console.log("Finishing shot:", shotInformation);
     const validatedShot = normaliseShotData(shotInformation);
-    console.log("Validated shot data:", validatedShot);
-    // push shot into current hole in roundData
-    // ! need to strip back logic flow
     setRoundData((prev) => {
       if (!prev) return prev;
+
       const updatedHoles = [...prev.holes];
       const holeIndex = currentHoleIndex - 1;
 
-      updatedHoles[holeIndex].shots.push(validatedShot);
-      updatedHoles[holeIndex].strokes += 1; // Increment strokes, can be adjusted for penalties
+      const updatedHole = {
+        ...updatedHoles[holeIndex],
+        shots: [...updatedHoles[holeIndex].shots, validatedShot],
+        strokes: updatedHoles[holeIndex].strokes + 1, // Increment strokes, can be adjusted for penalties
+      };
+
+      updatedHoles[holeIndex] = updatedHole;
 
       return {
         ...prev,
         holes: updatedHoles,
       };
     });
-    // prepare for next shot
-
-    createNewShot();
   };
 
   return (

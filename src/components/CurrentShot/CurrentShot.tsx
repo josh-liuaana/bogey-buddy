@@ -21,7 +21,13 @@ import { CurrentOnGreen } from "./CurrentOnGreen";
 export function CurrentShot() {
   const [club, setClub] = useState<Club | undefined>(undefined);
   const [distanceToHole, setDistanceToHole] = useState(0);
-  const { updateShotData, currentShotIndex, finishShot } = useRound();
+  const {
+    updateShotData,
+    currentShotIndex,
+    finishShot,
+    createNewShot,
+    finishHole,
+  } = useRound();
 
   useEffect(() => {
     const shotCategory = club === "Putter" ? "putt" : "standard";
@@ -34,6 +40,24 @@ export function CurrentShot() {
     });
   }, [distanceToHole, club, updateShotData]);
 
+  const handleSaveShot = () => {
+    if (!club) {
+      alert("Please select a club before saving the shot.");
+      return;
+    }
+    finishShot();
+    setClub(undefined);
+    setDistanceToHole(0);
+    createNewShot(false);
+  };
+
+  const handleHoleOut = () => {
+    finishHole();
+    setClub(undefined);
+    setDistanceToHole(0);
+    createNewShot(true);
+  };
+
   return (
     <div className="border-2 m-4 flex flex-col items-center">
       <p>Shot: {currentShotIndex}</p>
@@ -42,13 +66,13 @@ export function CurrentShot() {
         <div className="space-y-2 w-1/2">
           <Label className="">Club Selection</Label>
           <Select
-            defaultValue={club}
+            value={club ?? ""}
             onValueChange={(value) => setClub(value as Club)}
           >
             <SelectTrigger
               className={cn(
                 "border",
-                !club ? "border-red-500" : "border-gray-300",
+                !club ? "border-red-200" : "border-gray-300",
               )}
             >
               <SelectValue placeholder="Select a Club" />
@@ -80,7 +104,15 @@ export function CurrentShot() {
       </div>
       {club && (club === "Putter" ? <CurrentOnGreen /> : <CurrentOffGreen />)}
 
-      <Button onClick={() => finishShot()}>Save Shot</Button>
+      <Button
+        disabled={!club}
+        variant={club ? "default" : "secondary"}
+        onClick={handleSaveShot}
+      >
+        Save Shot
+      </Button>
+
+      {club === "Putter" && <Button onClick={handleHoleOut}>Sunk Putt</Button>}
     </div>
   );
 }

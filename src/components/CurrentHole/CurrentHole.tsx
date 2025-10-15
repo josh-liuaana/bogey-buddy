@@ -7,10 +7,13 @@ import { Button } from "../ui/button";
 export function CurrentHole() {
   const { currentHoleIndex } = useRound();
   const { selectedCourse } = useCourse();
+
+  const hole =
+    selectedCourse?.holes[currentHoleIndex > 0 ? currentHoleIndex - 1 : 0];
   const holeAttributes = {
-    par: selectedCourse?.holes[currentHoleIndex - 1].par ?? null,
-    length: selectedCourse?.holes[currentHoleIndex - 1].distance ?? null,
-    strokeIndex: selectedCourse?.holes[currentHoleIndex - 1].stroke ?? null,
+    par: hole?.par ?? null,
+    length: hole?.distance ?? null,
+    strokeIndex: hole?.stroke ?? null,
   };
 
   const handleEndHole = () => {
