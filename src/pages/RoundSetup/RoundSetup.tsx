@@ -14,6 +14,8 @@ import {
 import { useCourse } from "@/contexts/CourseContext";
 import { useRound } from "@/contexts/RoundContext";
 
+import logo from "../../assets/logo_proto.png";
+
 export function RoundSetup() {
   const { selectedCourse, setSelectedCourse, courseList } = useCourse();
   const [roundType, setRoundType] = useState<"playing-live" | "previous-entry">(
@@ -36,10 +38,12 @@ export function RoundSetup() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center text-center gap-8 p-10">
-      <h1 className="text-4xl text-center">Round Setup Page</h1>
-      <h1>New Round</h1>
-
+    <div className="bg-dune-sand text-deep-forest h-screen flex flex-col items-center justify-center gap-8">
+      <img src={logo} alt="Golf" className="w-30 h-30" />
+      <div>
+        <h1 className="text-4xl text-center mb-3">Before you tee off</h1>
+        <h2 className="text-xl text-center">Choose your course and lock in</h2>
+      </div>
       <RadioGroup
         value={roundType}
         onValueChange={(value) => setRoundType(value as typeof roundType)}
@@ -55,7 +59,7 @@ export function RoundSetup() {
           <Label htmlFor="previous-entry">Filling in previous round</Label>
         </div>
       </RadioGroup>
-      <div>
+      <div className="flex flex-col gap-2 items-center">
         <Label className="">Course Selection</Label>
         <Select
           onValueChange={(id) => {
@@ -74,10 +78,13 @@ export function RoundSetup() {
             ))}
           </SelectContent>
         </Select>
-        <Button onClick={handlePlay} className="">
-          Play
-        </Button>
       </div>
+      <Button
+        onClick={handlePlay}
+        className="px-6 py-6 text-2xl bg-terracotta text-dune-sand rounded flex items-center justify-center shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+      >
+        Tee off
+      </Button>
     </div>
   );
 }

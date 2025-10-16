@@ -1,4 +1,4 @@
-import { Navigate, Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthGate } from "@/components/AuthGate";
 import { Navbar } from "@/components/Navbar";
@@ -14,6 +14,7 @@ import { log } from "./utils/logger";
 
 function PrivateRoute() {
   const { user } = useAuth();
+  const location = useLocation();
 
   log("PrivateRoute", "Checking access", { hasUser: !!user });
 
@@ -25,7 +26,7 @@ function PrivateRoute() {
   log("PrivateRoute", "User verified — rendering private routes");
   return (
     <>
-      <Navbar />
+      {location.pathname !== "/" && <Navbar />}
       <Outlet />
     </>
   );

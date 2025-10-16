@@ -39,6 +39,13 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* 🌿 Earthy Palette */
+  --color-deep-forest: #4b5320;
+  --color-terracotta: #8b4513;
+  --color-dune-sand: #d8c49f;
+  --color-olive-drab: #6b8e23;
+  --color-saddle-brown: #804000;
 }
 
 :root {
@@ -74,6 +81,20 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.723 0.219 149.579);
+
+  /* EARTHY THEME */
+  /* --background: var(--color-earth-dune-sand);
+  --foreground: var(--color-earth-deep-forest);
+  --primary: var(--color-earth-terracotta);
+  --secondary: var(--color-earth-olive-drab);
+  --accent: var(--color-earth-saddle-brown); */
+
+  /* CUSTOM COLOUR PALATTE */
+  --earth-deep-forest: #4b5320;
+  --earth-terracotta: #8b4513;
+  --earth-dune-sand: #d8c49f;
+  --earth-olive-drab: #6b8e23;
+  --earth-saddle-brown: #804000;
 }
 
 .dark {
@@ -108,6 +129,13 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.527 0.154 150.069);
+
+  /* EARTHY THEME */
+  /* --background: var(--color-earth-deep-forest);
+  --foreground: var(--color-earth-dune-sand);
+  --primary: var(--color-earth-terracotta);
+  --secondary: var(--color-earth-saddle-brown);
+  --accent: var(--color-earth-olive-drab); */
 }
 
 @layer base {
