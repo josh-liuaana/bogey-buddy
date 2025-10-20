@@ -1,3 +1,6 @@
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -8,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRound } from "@/contexts/RoundContext";
+import { cn } from "@/lib/utils";
 import {
   ballFlights,
   ballShapes,
@@ -24,6 +28,7 @@ import {
 
 export function CurrentOffGreen() {
   const { updateShotData, shotInformation } = useRound();
+  const [shotPlan, setShotPlan] = useState(true);
 
   // Updates a top-level field in shotInformation
   const handleInputChange = (field: string, value: string) => {
@@ -55,16 +60,16 @@ export function CurrentOffGreen() {
     {}) as Partial<BaseStandardShot>;
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* Lie + Swing dropdowns */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 space-y-2">
+      <div className="grid grid-cols-2 gap-5">
+        <div className="flex flex-col gap-2 items-center ">
           <Label>Lie Condition</Label>
           <Select
             onValueChange={(value) => handleInputChange("lieCondition", value)}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select condition" />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Lie" />
             </SelectTrigger>
             <SelectContent>
               {lieConditions.map((condition) => (
@@ -76,13 +81,13 @@ export function CurrentOffGreen() {
           </Select>
         </div>
 
-        <div className="flex-1 space-y-2">
+        <div className="flex flex-col gap-2 items-center ">
           <Label>Shot type</Label>
           <Select
             onValueChange={(value) => handleInputChange("shotType", value)}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select shot type" />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Shot type" />
             </SelectTrigger>
             <SelectContent>
               {shotTypes.map((type) => (
@@ -94,7 +99,7 @@ export function CurrentOffGreen() {
           </Select>
         </div>
 
-        <div className="flex-1 space-y-2">
+        <div className="flex flex-col gap-2 items-center ">
           <Label>Swing Type</Label>
           <Select
             // onValueChange={(value) => handleInputChange("swingType", value)}
@@ -102,8 +107,8 @@ export function CurrentOffGreen() {
               handleIntendedShotChange("swingType", value)
             }
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select swing" />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Swing Type" />
             </SelectTrigger>
             <SelectContent>
               {swingTypes.map((type) => (
@@ -115,15 +120,15 @@ export function CurrentOffGreen() {
           </Select>
         </div>
 
-        <div className="flex-1 space-y-2">
+        <div className="flex flex-col gap-2 items-center ">
           <Label>Elevation Change</Label>
           <Select
             onValueChange={(value) =>
               handleIntendedShotChange("elevationChange", value)
             }
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Select elevation change" />
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Elevation" />
             </SelectTrigger>
             <SelectContent>
               {elevationChanges.map((type) => (
@@ -136,154 +141,253 @@ export function CurrentOffGreen() {
         </div>
       </div>
 
-      {/* Intended Shot */}
-      <div className="space-y-3">
-        <p className="font-semibold text-sm">INTENDED SHOT</p>
-        <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-5 bg-off-green">
+        <Button
+          onClick={() => setShotPlan(true)}
+          className={cn(
+            "w-full px-4 py-4 text-md flex items-center justify-center",
+            {
+              "bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]":
+                shotPlan,
+              "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
+                !shotPlan,
+            },
+          )}
+        >
+          Shot Plan
+        </Button>
+        <Button
+          onClick={() => setShotPlan(false)}
+          className={cn(
+            "w-full px-4 py-4 text-md flex items-center justify-center",
+            {
+              "bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]":
+                !shotPlan,
+              "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
+                shotPlan,
+            },
+          )}
+        >
+          Result
+        </Button>
+      </div>
+
+      {shotPlan ? (
+        // {/* Intended Shot */}
+        <div className="">
           {/* Ball Flight */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Ball Flight</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Ball Flight
+            </Label>
             <RadioGroup
               value={intended.ballFlight ?? ""}
               onValueChange={(value) =>
                 handleIntendedShotChange("ballFlight", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {ballFlights.map((flight) => (
-                  <div key={flight} className="flex items-center space-x-2">
-                    <RadioGroupItem value={flight} id={`int-${flight}`} />
-                    <Label htmlFor={`int-${flight}`} className="text-sm">
-                      {flight}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {ballFlights.map((flight) => (
+                <div key={flight}>
+                  <RadioGroupItem
+                    value={flight}
+                    id={`int-${flight}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`int-${flight}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {flight}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
 
           {/* Shot Shape */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Shot Shape</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Shot Shape
+            </Label>
             <RadioGroup
               value={intended.ballShape}
               onValueChange={(value) =>
                 handleIntendedShotChange("ballShape", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {ballShapes.map((shape) => (
-                  <div key={shape} className="flex items-center space-x-2">
-                    <RadioGroupItem value={shape} id={`int-${shape}`} />
-                    <Label htmlFor={`int-${shape}`} className="text-sm">
-                      {shape}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {ballShapes.map((shape) => (
+                <div key={shape}>
+                  <RadioGroupItem
+                    value={shape}
+                    id={`int-${shape}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`int-${shape}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {shape}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
         </div>
-      </div>
-
-      {/* Result */}
-      <div className="space-y-3">
-        <p className="font-semibold text-sm">RESULT</p>
-        <div className="space-y-4">
+      ) : (
+        <div className="">
           {/* Ball Flight */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Ball Flight</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Ball Flight
+            </Label>
             <RadioGroup
-              value={actual.ballFlight}
+              value={actual.ballFlight ?? ""}
               onValueChange={(value) =>
                 handleActualShotChange("ballFlight", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {ballFlights.map((flight) => (
-                  <div key={flight} className="flex items-center space-x-2">
-                    <RadioGroupItem value={flight} id={`res-${flight}`} />
-                    <Label htmlFor={`res-${flight}`} className="text-sm">
-                      {flight}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {ballFlights.map((flight) => (
+                <div key={flight}>
+                  <RadioGroupItem
+                    value={flight}
+                    id={`int-${flight}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`int-${flight}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {flight}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
 
           {/* Shot Shape */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Shot Shape</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Shot Shape
+            </Label>
             <RadioGroup
               value={actual.ballShape}
               onValueChange={(value) =>
                 handleActualShotChange("ballShape", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {ballShapes.map((shape) => (
-                  <div key={shape} className="flex items-center space-x-2">
-                    <RadioGroupItem value={shape} id={`res-${shape}`} />
-                    <Label htmlFor={`res-${shape}`} className="text-sm">
-                      {shape}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {ballShapes.map((shape) => (
+                <div key={shape}>
+                  <RadioGroupItem
+                    value={shape}
+                    id={`int-${shape}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`int-${shape}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {shape}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
 
           {/* Direction to Target */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Direction to Target</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Direction to Target
+            </Label>
             <RadioGroup
               value={actual.directionToTarget}
               onValueChange={(value) =>
                 handleActualShotChange("directionToTarget", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {directionToTargets.map((direction) => (
-                  <div key={direction} className="flex items-center space-x-2">
-                    <RadioGroupItem value={direction} id={`dir-${direction}`} />
-                    <Label htmlFor={`dir-${direction}`} className="text-sm">
-                      {direction}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {directionToTargets.map((direction) => (
+                <div key={direction}>
+                  <RadioGroupItem
+                    value={direction}
+                    id={`dir-${direction}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`dir-${direction}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {direction}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
 
           {/* Distance to Target */}
-          <div className="space-y-1">
-            <Label className="text-xs font-medium">Distance to Target</Label>
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Distance to Target
+            </Label>
             <RadioGroup
               value={actual.distanceToTarget}
               onValueChange={(value) =>
                 handleActualShotChange("distanceToTarget", value)
               }
+              className="grid grid-cols-3 gap-2 w-full"
             >
-              <div className="flex flex-wrap gap-3">
-                {distanceToTargets.map((distance) => (
-                  <div key={distance} className="flex items-center space-x-2">
-                    <RadioGroupItem value={distance} id={`dist-${distance}`} />
-                    <Label htmlFor={`dist-${distance}`} className="text-sm">
-                      {distance}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+              {distanceToTargets.map((distance) => (
+                <div key={distance}>
+                  <RadioGroupItem
+                    value={distance}
+                    id={`dist-${distance}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`dist-${distance}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {distance === "On Target" ? "True" : distance}
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
-          <div className="flex-1 space-y-2">
-            <Label>Result Condition</Label>
+
+          <div className="flex flex-row gap-5 items-center justify-evenly">
+            <Label>Result</Label>
             <Select
               onValueChange={(value) => handleInputChange("result", value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select result condition" />
+                <SelectValue placeholder="Select result" />
               </SelectTrigger>
               <SelectContent>
                 {resultConditions.map((type) => (
@@ -295,7 +399,7 @@ export function CurrentOffGreen() {
             </Select>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

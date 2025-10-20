@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { TbRulerMeasure } from "react-icons/tb";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -11,7 +10,6 @@ import {
 } from "@/components/ui/select";
 import { type Club, clubs } from "@/constants/clubs";
 import { useRound } from "@/contexts/RoundContext";
-import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -59,22 +57,17 @@ export function CurrentShot() {
   };
 
   return (
-    <div className="border-2 m-4 flex flex-col items-center">
-      <p>Shot: {currentShotIndex}</p>
-      <div className="flex flex-row gap-4 h-20">
+    <div className="flex flex-col items-center gap-4 m-4 p-4 border-2 border-deep-forest rounded-lg ">
+      <h3 className="text-xl">Shot: {currentShotIndex}</h3>
+      <div className="grid grid-cols-2 gap-5">
         {/* Club Selection */}
-        <div className="space-y-2 w-1/2">
-          <Label className="">Club Selection</Label>
+        <div className="flex flex-col gap-2 items-center ">
+          <Label>Club Selection</Label>
           <Select
             value={club ?? ""}
             onValueChange={(value) => setClub(value as Club)}
           >
-            <SelectTrigger
-              className={cn(
-                "border",
-                !club ? "border-red-200" : "border-gray-300",
-              )}
-            >
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select a Club" />
             </SelectTrigger>
             <SelectContent>
@@ -88,31 +81,39 @@ export function CurrentShot() {
         </div>
 
         {/* Distance to Hole */}
-        <div className="space-y-2  w-1/2">
+        <div className="flex flex-col gap-2 items-center ">
           <Label htmlFor="distance">Distance to Hole</Label>
-          <div className="flex items-center gap-2">
+          <div>
             <Input
               id="distance"
               placeholder="e.g. 25m"
-              className="flex-1"
+              className="w-full"
               value={distanceToHole}
               onChange={(e) => setDistanceToHole(+e.target.value)}
             />
-            <TbRulerMeasure className="text-muted-foreground" />
           </div>
         </div>
       </div>
       {club && (club === "Putter" ? <CurrentOnGreen /> : <CurrentOffGreen />)}
 
-      <Button
-        disabled={!club}
-        variant={club ? "default" : "secondary"}
-        onClick={handleSaveShot}
-      >
-        Save Shot
-      </Button>
-
-      {club === "Putter" && <Button onClick={handleHoleOut}>Sunk Putt</Button>}
+      <div className="flex flex-row border-red-500 gap-5">
+        {club === "Putter" && (
+          <Button
+            className="px-4 py-4 text-md flex items-center justify-center bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+            onClick={handleHoleOut}
+          >
+            Sunk Putt
+          </Button>
+        )}
+        {club && (
+          <Button
+            onClick={handleSaveShot}
+            className="px-4 py-4 text-md flex items-center justify-center bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]"
+          >
+            Save Shot
+          </Button>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,20 +1,17 @@
 import { CurrentHole } from "@/components/CurrentHole";
-import { Button } from "@/components/ui/button";
 import { useRound } from "@/contexts/RoundContext";
 
 export function CurrentRound() {
-  const { currentRound, endRound } = useRound();
+  const { currentRound } = useRound();
 
   if (!currentRound) {
     return <p>No active round. Please start one first.</p>;
   }
 
   return (
-    <div className="m-2">
-      <h1>Current Round</h1>
-      <p>Course: {currentRound.course.title}</p>
+    <div className="flex flex-col items-center pt-4 text-deep-forest bg-dune-sand min-h-screen">
+      <h1 className="text-xl ">{currentRound.course.title}</h1>
       <CurrentHole />
-      <Button onClick={endRound}>End Round</Button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { IconType } from "react-icons";
 import { FaRegCircle } from "react-icons/fa";
 import {
@@ -14,6 +15,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRound } from "@/contexts/RoundContext";
+import { cn } from "@/lib/utils";
 import {
   directionToTargets,
   distanceToTargets,
@@ -22,6 +24,8 @@ import {
   type Putt,
   type Read,
 } from "@/types/roundData";
+
+import { Button } from "../ui/button";
 
 // Combine direction + pace options into one 3x3 grid
 type ReadCombo = `${Pace}-${Read}`;
@@ -44,6 +48,7 @@ const readGridIcons: Record<ReadCombo, IconType> = {
 
 export function CurrentOnGreen() {
   const { shotInformation, updateShotData } = useRound();
+  const [shotPlan, setShotPlan] = useState(true);
 
   // updates nested actualIntendedShotResult fields
   const handleIntendedShotChange = (value: string) => {
@@ -74,112 +79,181 @@ export function CurrentOnGreen() {
   const actual = (shotInformation.actualShotResult || {}) as Putt;
 
   return (
-    <div className="space-y-6">
-      {/* READ GRID */}
-      <div className="space-y-3">
-        <p className="font-semibold text-sm">READ & PACE</p>
-        <p className="text-xs text-muted-foreground">
-          Tap to select your <span className="font-medium">read direction</span>{" "}
-          and <span className="font-medium">pace</span>.
-        </p>
-
-        <RadioGroup
-          className="grid grid-cols-3 gap-2 max-w-[240px]"
-          onValueChange={(value) => handleIntendedShotChange(value)}
+    <div className="w-full space-y-6">
+      <div className="grid grid-cols-2 gap-5 bg-off-green">
+        <Button
+          onClick={() => setShotPlan(true)}
+          className={cn(
+            "w-full px-4 py-4 text-md flex items-center justify-center",
+            {
+              "bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]":
+                shotPlan,
+              "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
+                !shotPlan,
+            },
+          )}
         >
-          {paceOptions.map((pace) =>
-            readDirections.map((read) => {
-              const combo = `${pace}-${read}` as ReadCombo;
-              const Icon = readGridIcons[combo];
-              return (
-                <div key={combo} className="flex flex-col items-center">
+          Shot Plan
+        </Button>
+        <Button
+          onClick={() => setShotPlan(false)}
+          className={cn(
+            "w-full px-4 py-4 text-md flex items-center justify-center",
+            {
+              "bg-deep-forest text-dune-sand shadow-[0_4px_10px_rgba(0,0,0,0.5)]":
+                !shotPlan,
+              "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
+                shotPlan,
+            },
+          )}
+        >
+          Result
+        </Button>
+      </div>
+
+      {shotPlan ? (
+        // {/* READ GRID */}
+        <div className="border rounded-lg py-2 px-4 flex flex-col items-center gap-4">
+          <div>
+            <p className="text-md font-medium text-center">Read & Pace</p>
+            <p className="text-xs text-center text-muted-foreground">
+              Tap to select your{" "}
+              <span className="font-medium">read direction</span> and{" "}
+              <span className="font-medium">pace</span>.
+            </p>
+          </div>
+          <RadioGroup
+            className="grid grid-cols-3 gap-5 w-full"
+            onValueChange={(value) => handleIntendedShotChange(value)}
+          >
+            {paceOptions.map((pace) =>
+              readDirections.map((read) => {
+                const combo = `${pace}-${read}` as ReadCombo;
+                const Icon = readGridIcons[combo];
+                return (
+                  <div key={combo} className="flex flex-col items-center">
+                    <RadioGroupItem
+                      value={combo}
+                      id={combo}
+                      className="peer sr-only"
+                    />
+                    <Label
+                      htmlFor={combo}
+                      className="flex aspect-square w-full items-center justify-center rounded-md border border-deep-forest bg-dune-sand peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand"
+                    >
+                      <Icon className="w-6 h-6" />
+                    </Label>
+                  </div>
+                );
+              }),
+            )}
+          </RadioGroup>
+        </div>
+      ) : (
+        // {/* RESULT SECTION */}
+        <div className="">
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Miss Side
+            </Label>
+            <RadioGroup
+              value={actual.missSide}
+              onValueChange={(value) =>
+                handleActualShotChange("missSide", value)
+              }
+              className="grid grid-cols-3 gap-2 w-full"
+            >
+              {missSides.map((missSide) => (
+                <div key={missSide}>
                   <RadioGroupItem
-                    value={combo}
-                    id={combo}
+                    value={missSide}
+                    id={`int-${missSide}`}
                     className="peer sr-only"
                   />
-                  <Label
-                    htmlFor={combo}
-                    className="flex h-12 w-12 items-center justify-center rounded-md border border-input bg-background cursor-pointer transition-colors peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground"
+                  <label
+                    htmlFor={`int-${missSide}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
                   >
-                    <Icon className="w-5 h-5" />
-                  </Label>
-                </div>
-              );
-            }),
-          )}
-        </RadioGroup>
-      </div>
-
-      <hr className="border" />
-
-      {/* RESULT SECTION */}
-      <div className="space-y-4">
-        <p className="font-semibold text-sm">RESULT</p>
-
-        {/* Miss Side */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium">Miss Side</Label>
-          <RadioGroup
-            value={actual.missSide}
-            onValueChange={(value) => handleActualShotChange("missSide", value)}
-          >
-            <div className="flex flex-wrap gap-3">
-              {missSides.map((missSide) => (
-                <div key={missSide} className="flex items-center space-x-2">
-                  <RadioGroupItem value={missSide} id={`miss-${missSide}`} />
-                  <Label htmlFor={`miss-${missSide}`} className="text-sm">
                     {missSide}
-                  </Label>
+                  </label>
                 </div>
               ))}
-            </div>
-          </RadioGroup>
-        </div>
+            </RadioGroup>
+          </div>
 
-        <div className="space-y-1">
-          <Label className="text-xs font-medium">Direction to Target</Label>
-          <RadioGroup
-            value={actual.directionToTarget}
-            onValueChange={(value) =>
-              handleActualShotChange("directionToTarget", value)
-            }
-          >
-            <div className="flex flex-wrap gap-3">
+          {/* Direction to Target */}
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Direction to Target
+            </Label>
+            <RadioGroup
+              value={actual.directionToTarget}
+              onValueChange={(value) =>
+                handleActualShotChange("directionToTarget", value)
+              }
+              className="grid grid-cols-3 gap-2 w-full"
+            >
               {directionToTargets.map((direction) => (
-                <div key={direction} className="flex items-center space-x-2">
-                  <RadioGroupItem value={direction} id={`dir-${direction}`} />
-                  <Label htmlFor={`dir-${direction}`} className="text-sm">
+                <div key={direction}>
+                  <RadioGroupItem
+                    value={direction}
+                    id={`dir-${direction}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`dir-${direction}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
                     {direction}
-                  </Label>
+                  </label>
                 </div>
               ))}
-            </div>
-          </RadioGroup>
-        </div>
+            </RadioGroup>
+          </div>
 
-        {/* Distance to Target */}
-        <div className="space-y-1">
-          <Label className="text-xs font-medium">Distance to Target</Label>
-          <RadioGroup
-            value={actual.distanceToTarget}
-            onValueChange={(value) =>
-              handleActualShotChange("distanceToTarget", value)
-            }
-          >
-            <div className="flex flex-wrap gap-3">
+          {/* Distance to Target */}
+          <div className="mb-4 gap-3 flex flex-col border rounded-lg py-2 px-4">
+            <Label className="text-md font-medium justify-center">
+              Distance to Target
+            </Label>
+            <RadioGroup
+              value={actual.distanceToTarget}
+              onValueChange={(value) =>
+                handleActualShotChange("distanceToTarget", value)
+              }
+              className="grid grid-cols-3 gap-2 w-full"
+            >
               {distanceToTargets.map((distance) => (
-                <div key={distance} className="flex items-center space-x-2">
-                  <RadioGroupItem value={distance} id={`dist-${distance}`} />
-                  <Label htmlFor={`dist-${distance}`} className="text-sm">
-                    {distance}
-                  </Label>
+                <div key={distance}>
+                  <RadioGroupItem
+                    value={distance}
+                    id={`dist-${distance}`}
+                    className="peer sr-only"
+                  />
+                  <label
+                    htmlFor={`dist-${distance}`}
+                    className={cn(
+                      "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
+                      "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                    )}
+                  >
+                    {distance === "On Target" ? "True" : distance}
+                  </label>
                 </div>
               ))}
-            </div>
-          </RadioGroup>
+            </RadioGroup>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
