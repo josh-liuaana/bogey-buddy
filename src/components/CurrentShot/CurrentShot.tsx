@@ -17,26 +17,39 @@ import { CurrentOffGreen } from "./CurrentOffGreen";
 import { CurrentOnGreen } from "./CurrentOnGreen";
 
 export function CurrentShot() {
-  const [club, setClub] = useState<Club | undefined>(undefined);
-  const [distanceToHole, setDistanceToHole] = useState(0);
   const {
     updateShotData,
     currentShotIndex,
     finishShot,
     createNewShot,
     finishHole,
+    shotInformation,
   } = useRound();
+  const [club, setClub] = useState<Club | undefined>(
+    (shotInformation.club as Club) || undefined,
+  );
+  const [distanceToHole, setDistanceToHole] = useState(
+    shotInformation.distanceToHole || 0,
+  );
 
   useEffect(() => {
-    const shotCategory = club === "Putter" ? "putt" : "standard";
-    const shotType = club === "Putter" ? "Putt" : "Full Shot";
-    updateShotData({
-      distanceToHole: distanceToHole,
-      club: club,
-      shotCategory: shotCategory,
-      shotType: shotType,
-    });
+    if (club || distanceToHole > 0) {
+      const shotCategory = club === "Putter" ? "putt" : "standard";
+      const shotType = club === "Putter" ? "Putt" : "Full Shot";
+
+      updateShotData({
+        distanceToHole: distanceToHole,
+        club: club,
+        shotCategory: shotCategory,
+        shotType: shotType,
+      });
+    }
   }, [distanceToHole, club, updateShotData]);
+
+  useEffect(() => {
+    setClub((shotInformation.club as Club) || undefined);
+    setDistanceToHole(shotInformation.distanceToHole || 0);
+  }, [currentShotIndex, shotInformation.club, shotInformation.distanceToHole]);
 
   const handleSaveShot = () => {
     if (!club) {
@@ -44,15 +57,11 @@ export function CurrentShot() {
       return;
     }
     finishShot();
-    setClub(undefined);
-    setDistanceToHole(0);
     createNewShot(false);
   };
 
   const handleHoleOut = () => {
     finishHole();
-    setClub(undefined);
-    setDistanceToHole(0);
     createNewShot(true);
   };
 

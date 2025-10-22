@@ -13,3 +13,10 @@ type HoleAttributes = {
   distance: number;
   stroke: number;
 };
+
+export type CurrentRound = {
+  course: CourseWithId;
+  roundType: RoundType;
+};
+
+type RoundType = "playing-live" | "previous-entry";

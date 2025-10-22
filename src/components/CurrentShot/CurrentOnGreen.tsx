@@ -17,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRound } from "@/contexts/RoundContext";
 import { cn } from "@/lib/utils";
 import {
+  type BasePutt,
   directionToTargets,
   distanceToTargets,
   missSides,
@@ -77,6 +78,7 @@ export function CurrentOnGreen() {
   };
 
   const actual = (shotInformation.actualShotResult || {}) as Putt;
+  const intended = shotInformation.intendedShotResult as Partial<BasePutt>;
 
   return (
     <div className="w-full space-y-6">
@@ -125,6 +127,11 @@ export function CurrentOnGreen() {
           <RadioGroup
             className="grid grid-cols-3 gap-5 w-full"
             onValueChange={(value) => handleIntendedShotChange(value)}
+            value={
+              intended.pace && intended.read
+                ? `${intended.pace}-${intended.read}`
+                : undefined
+            }
           >
             {paceOptions.map((pace) =>
               readDirections.map((read) => {
