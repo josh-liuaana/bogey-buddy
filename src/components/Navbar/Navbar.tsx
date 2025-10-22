@@ -5,6 +5,7 @@ import { TiThMenu } from "react-icons/ti";
 import { useNavigate } from "react-router-dom";
 
 import { ExpandableDock } from "@/components/ui/expandable-dock";
+import { log } from "@/utils/logger";
 
 import { app } from "../../../firebase";
 
@@ -15,7 +16,7 @@ export function Navbar() {
     const auth = getAuth(app);
     signOut(auth)
       .then(() => {
-        console.log("User signed out successfully.");
+        log("Auth", "User signed out successfully.");
       })
       .catch((error) => {
         console.error("Sign-out failed:", error);

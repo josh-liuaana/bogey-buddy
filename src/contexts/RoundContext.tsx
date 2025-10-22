@@ -114,15 +114,15 @@ const initialShotInformation = initialLocalStorageState
 
 export function RoundProvider({ children }: { children: ReactNode }) {
   const [currentRound, setCurrentRound] = useState<CurrentRound | null>(
-    initialCurrentRound
+    initialCurrentRound,
   );
   const [roundData, setRoundData] = useState<RoundData | undefined>(
-    initialRoundData
+    initialRoundData,
   );
   const [currentHoleIndex, setCurrentHoleIndex] = useState(initialHoleIndex);
   const [currentShotIndex, setCurrentShotIndex] = useState(initialShotIndex);
   const [shotInformation, setShotInformation] = useState<ShotInformation>(
-    initialShotInformation
+    initialShotInformation,
   );
 
   useEffect(() => {
@@ -172,12 +172,12 @@ export function RoundProvider({ children }: { children: ReactNode }) {
 
       const totalScore = prev.holes.reduce(
         (sum, hole) => sum + hole.strokes,
-        0
+        0,
       );
       const totalPutts = prev.holes.reduce((sum, hole) => sum + hole.putts, 0);
       const totalPenaltyStrokes = prev.holes.reduce(
         (sum, hole) => sum + hole.penaltyStrokes,
-        0
+        0,
       );
       const fairwaysHit = prev.holes.reduce((sum, hole) => {
         if (hole.fairwayHit) return sum + 1;
@@ -207,7 +207,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
     log(
       "RoundProvider",
       "Ending round for course:",
-      currentRound?.course.title
+      currentRound?.course.title,
     );
 
     try {
@@ -229,7 +229,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
     log(
       "RoundProvider",
       "Abandoning round for course:",
-      currentRound?.course.title
+      currentRound?.course.title,
     );
     clearLocalStorageState();
     setCurrentRound(null);
@@ -348,7 +348,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
         return merged;
       });
     },
-    [setShotInformation]
+    [setShotInformation],
   );
 
   const finishShot = () => {

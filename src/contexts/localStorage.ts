@@ -1,5 +1,6 @@
 import type { CurrentRound } from "@/types/course";
 import type { RoundData, ShotInformation } from "@/types/roundData";
+import { log } from "@/utils/logger";
 
 export const ROUND_STORAGE_KEY = "bogeyBuddyCurrentRound";
 
@@ -42,7 +43,7 @@ export function saveLocalStorageState(state: LocalStorageState): void {
   try {
     const serializedState = JSON.stringify(state);
     window.localStorage.setItem(ROUND_STORAGE_KEY, serializedState);
-    console.log("Current round saved to localStorage."); // Use for debugging
+    log("localStorage", "Current round saved to localStorage."); // Use for debugging
   } catch (e) {
     console.error("❌ Error saving round data to localStorage:", e);
   }
@@ -53,5 +54,5 @@ export function saveLocalStorageState(state: LocalStorageState): void {
  */
 export function clearLocalStorageState(): void {
   window.localStorage.removeItem(ROUND_STORAGE_KEY);
-  console.log("✅ Local round cleared.");
+  log("localStorage", "Local round cleared.");
 }
