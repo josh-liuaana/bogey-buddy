@@ -1,7 +1,7 @@
-import { CurrentHole } from "@/components/CurrentHole";
-import { useRound } from "@/contexts/RoundContext";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
+import { CurrentHole } from "@/components/CurrentHole";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,13 +13,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useRound } from "@/contexts/RoundContext";
 
 export function CurrentRound() {
-  const { currentRound, currentHoleIndex } = useRound();
+  const { currentRound, currentHoleIndex, endRound, abandonRound } = useRound();
+  const navigate = useNavigate();
 
   if (!currentRound) {
     return <p>No active round. Please start one first.</p>;
   }
+
+  const handleRoundCompletion = async () => {
+    alert("Round completed!");
+    const result = await endRound();
+    navigate("/round-summary", { state: result });
+  };
+
+  const handleRoundDelete = () => {
+    alert("Round abandoned!");
+    abandonRound();
+    navigate("/");
+  };
 
   return (
     <div className="flex flex-col items-center pt-4 pb-10 text-deep-forest bg-dune-sand min-h-screen">
@@ -45,13 +59,13 @@ export function CurrentRound() {
                   Cancel
                 </AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => alert("Round data deleted")}
+                  onClick={handleRoundDelete}
                   className="bg-red-500"
                 >
                   Delete
                 </AlertDialogAction>
                 <AlertDialogAction
-                  onClick={() => alert("Round submitted")}
+                  onClick={handleRoundCompletion}
                   className="bg-deep-forest border-2 border-dune-sand text-dune-sand"
                 >
                   Submit Current Round
@@ -83,7 +97,7 @@ export function CurrentRound() {
                 </AlertDialogCancel>
 
                 <AlertDialogAction
-                  onClick={() => alert("Round submitted")}
+                  onClick={handleRoundCompletion}
                   className="bg-deep-forest border-2 border-dune-sand text-dune-sand"
                 >
                   Complete Round

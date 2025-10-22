@@ -1,4 +1,5 @@
 import { getAuth } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
 import {
   createContext,
   type ReactNode,
@@ -19,6 +20,7 @@ import {
 } from "@/types/roundData";
 import { log } from "@/utils/logger";
 
+import { db } from "../../firebase";
 import {
   getDateAndTimeStrings,
   normaliseShotData,
@@ -30,7 +32,6 @@ type CurrentRound = {
   course: CourseWithId;
   roundType: RoundType;
 };
-
 type RoundContextType = {
   // * context state
   currentRound: CurrentRound | null;
@@ -43,8 +44,8 @@ type RoundContextType = {
 
   // * round functions
   startRound: (round: CurrentRound) => void;
-  endRound: () => void;
-  updateRoundAggregates: () => void;
+  endRound: () => Promise<string | null>;
+  abandonRound: () => void;
 
   // * hole functions
   initializeHole: (holeNumber: number) => void;
@@ -125,12 +126,67 @@ export function RoundProvider({ children }: { children: ReactNode }) {
   };
 
   const updateRoundAggregates = () => {
-    // TODO Calculations for score, putts, penalties, FIR, GIR
+    setRoundData((prev) => {
+      if (!prev) return prev;
+
+      const totalScore = prev.holes.reduce(
+        (sum, hole) => sum + hole.strokes,
+        0,
+      );
+      const totalPutts = prev.holes.reduce((sum, hole) => sum + hole.putts, 0);
+      const totalPenaltyStrokes = prev.holes.reduce(
+        (sum, hole) => sum + hole.penaltyStrokes,
+        0,
+      );
+      const fairwaysHit = prev.holes.reduce((sum, hole) => {
+        if (hole.fairwayHit) return sum + 1;
+        return sum;
+      }, 0);
+      const greensInRegulation = prev.holes.reduce((sum, hole) => {
+        if (hole.greenInRegulation) return sum + 1;
+        return sum;
+      }, 0);
+
+      return {
+        ...prev,
+        totalScore,
+        totalPutts,
+        totalPenaltyStrokes,
+        fairwaysHit,
+        greensInRegulation,
+      };
+    });
+
+    log("RoundProvider", "Updating round aggregates");
   };
 
-  const endRound = () => {
-    // TODO Calculate final aggregates before ending, then redirect to a round summary page
+  const endRound = async () => {
     updateRoundAggregates();
+
+    log(
+      "RoundProvider",
+      "Ending round for course:",
+      currentRound?.course.title,
+    );
+
+    try {
+      console.log("Final round data to be saved:", roundData);
+      const docRef = await addDoc(collection(db, "roundData"), roundData);
+      log("RoundProvider", "Round data saved with ID:", docRef.id);
+      setCurrentRound(null);
+      return docRef.id;
+    } catch (error) {
+      log("RoundProvider", "Error saving round data:", error);
+      return null;
+    }
+  };
+
+  const abandonRound = () => {
+    log(
+      "RoundProvider",
+      "Abandoning round for course:",
+      currentRound?.course.title,
+    );
     setCurrentRound(null);
   };
 
@@ -166,10 +222,49 @@ export function RoundProvider({ children }: { children: ReactNode }) {
 
   const finishHole = () => {
     log("RoundProvider", "Finishing hole number:", currentHoleIndex);
+
+    calculateHoleStatistics();
     finishShot();
 
-    updateRoundAggregates();
     initializeHole(currentHoleIndex + 1);
+    updateRoundAggregates();
+  };
+
+  const calculateHoleStatistics = () => {
+    const holePar = roundData?.holes?.[currentHoleIndex - 1]?.par ?? 0;
+
+    const shots = roundData?.holes?.[currentHoleIndex - 1]?.shots ?? [];
+    const strokesToGreen =
+      shots.filter((shot) => shot.result !== "Green").length || 0;
+
+    let FIR = false;
+    if (holePar !== 3) {
+      FIR = shots[0].result === "Fairway";
+    }
+
+    const GIR = strokesToGreen <= holePar - 2;
+    const putts = shots.length - strokesToGreen;
+
+    setRoundData((prev) => {
+      if (!prev) return prev;
+
+      const updatedHoles = [...prev.holes];
+      const holeIndex = currentHoleIndex - 1;
+
+      const updatedHole = {
+        ...updatedHoles[holeIndex],
+        putts: putts,
+        fairwayHit: FIR,
+        greenInRegulation: GIR,
+      };
+
+      updatedHoles[holeIndex] = updatedHole;
+
+      return {
+        ...prev,
+        holes: updatedHoles,
+      };
+    });
   };
 
   // ** SHOT-LEVEL FUNCTIONS ** //
@@ -245,7 +340,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
 
         startRound,
         endRound,
-        updateRoundAggregates,
+        abandonRound,
 
         initializeHole,
         setCurrentHoleIndex,

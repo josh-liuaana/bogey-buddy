@@ -8,6 +8,7 @@ import { Home } from "@/pages/Home";
 import { Login } from "@/pages/Login";
 import { Profile } from "@/pages/Profile";
 import { RoundSetup } from "@/pages/RoundSetup";
+import { RoundSummary } from "@/pages/RoundSummary";
 import { Statistics } from "@/pages/Statistics";
 
 import { log } from "./utils/logger";
@@ -71,6 +72,7 @@ export function App() {
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/round-setup" element={<RoundSetup />} />
         <Route path="/current-round" element={<CurrentRound />} />
+        <Route path="/round-summary" element={<RoundSummary />} />
       </Route>
     </Routes>
   );
