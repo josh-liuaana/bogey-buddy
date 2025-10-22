@@ -5,33 +5,33 @@ import {
   type ReactNode,
   useCallback,
   useContext,
+  useEffect,
   useState,
 } from "react";
 
-import type { CourseWithId } from "@/types/course";
-import {
-  type IntendedShotData,
-  type LieCondition,
-  type ResultCondition,
-  type RoundData,
-  type ShotData,
-  type ShotInformation,
-  type ShotType,
+import type { CurrentRound } from "@/types/course";
+import type {
+  IntendedShotData,
+  LieCondition,
+  ResultCondition,
+  RoundData,
+  ShotData,
+  ShotInformation,
+  ShotType,
 } from "@/types/roundData";
 import { log } from "@/utils/logger";
 
 import { db } from "../../firebase";
 import {
+  clearLocalStorageState,
+  loadLocalStorageState,
+  saveLocalStorageState,
+} from "./localStorage";
+import {
   getDateAndTimeStrings,
   normaliseShotData,
 } from "./roundContextHelpers";
 
-type RoundType = "playing-live" | "previous-entry";
-
-type CurrentRound = {
-  course: CourseWithId;
-  roundType: RoundType;
-};
 type RoundContextType = {
   // * context state
   currentRound: CurrentRound | null;
@@ -94,14 +94,55 @@ function defaultShotInformation(shotNumber = 1): ShotInformation {
   };
 }
 
+const initialLocalStorageState = loadLocalStorageState();
+
+const initialCurrentRound = initialLocalStorageState
+  ? initialLocalStorageState.currentRound
+  : null;
+const initialRoundData = initialLocalStorageState
+  ? initialLocalStorageState.roundData
+  : undefined;
+const initialHoleIndex = initialLocalStorageState
+  ? initialLocalStorageState.currentHoleIndex
+  : 0;
+const initialShotIndex = initialLocalStorageState
+  ? initialLocalStorageState.currentShotIndex
+  : 0;
+const initialShotInformation = initialLocalStorageState
+  ? initialLocalStorageState.shotInformation
+  : defaultShotInformation(initialShotIndex || 0);
+
 export function RoundProvider({ children }: { children: ReactNode }) {
-  const [currentRound, setCurrentRound] = useState<CurrentRound | null>(null);
-  const [roundData, setRoundData] = useState<RoundData | undefined>(undefined);
-  const [currentHoleIndex, setCurrentHoleIndex] = useState(0);
-  const [currentShotIndex, setCurrentShotIndex] = useState(0);
-  const [shotInformation, setShotInformation] = useState<ShotInformation>(
-    defaultShotInformation(0),
+  const [currentRound, setCurrentRound] = useState<CurrentRound | null>(
+    initialCurrentRound
   );
+  const [roundData, setRoundData] = useState<RoundData | undefined>(
+    initialRoundData
+  );
+  const [currentHoleIndex, setCurrentHoleIndex] = useState(initialHoleIndex);
+  const [currentShotIndex, setCurrentShotIndex] = useState(initialShotIndex);
+  const [shotInformation, setShotInformation] = useState<ShotInformation>(
+    initialShotInformation
+  );
+
+  useEffect(() => {
+    if (currentRound && roundData) {
+      const stateToPersist = {
+        currentRound,
+        roundData,
+        currentHoleIndex,
+        currentShotIndex,
+        shotInformation,
+      };
+      saveLocalStorageState(stateToPersist);
+    }
+  }, [
+    currentRound,
+    roundData,
+    currentHoleIndex,
+    currentShotIndex,
+    shotInformation,
+  ]);
 
   // ** ROUND-LEVEL FUNCTIONS ** //
 
@@ -131,12 +172,12 @@ export function RoundProvider({ children }: { children: ReactNode }) {
 
       const totalScore = prev.holes.reduce(
         (sum, hole) => sum + hole.strokes,
-        0,
+        0
       );
       const totalPutts = prev.holes.reduce((sum, hole) => sum + hole.putts, 0);
       const totalPenaltyStrokes = prev.holes.reduce(
         (sum, hole) => sum + hole.penaltyStrokes,
-        0,
+        0
       );
       const fairwaysHit = prev.holes.reduce((sum, hole) => {
         if (hole.fairwayHit) return sum + 1;
@@ -166,13 +207,16 @@ export function RoundProvider({ children }: { children: ReactNode }) {
     log(
       "RoundProvider",
       "Ending round for course:",
-      currentRound?.course.title,
+      currentRound?.course.title
     );
 
     try {
-      console.log("Final round data to be saved:", roundData);
+      log("RoundProvider", "Final round data to be saved:", roundData);
       const docRef = await addDoc(collection(db, "roundData"), roundData);
       log("RoundProvider", "Round data saved with ID:", docRef.id);
+
+      clearLocalStorageState();
+
       setCurrentRound(null);
       return docRef.id;
     } catch (error) {
@@ -185,8 +229,9 @@ export function RoundProvider({ children }: { children: ReactNode }) {
     log(
       "RoundProvider",
       "Abandoning round for course:",
-      currentRound?.course.title,
+      currentRound?.course.title
     );
+    clearLocalStorageState();
     setCurrentRound(null);
   };
 
@@ -303,7 +348,7 @@ export function RoundProvider({ children }: { children: ReactNode }) {
         return merged;
       });
     },
-    [setShotInformation],
+    [setShotInformation]
   );
 
   const finishShot = () => {

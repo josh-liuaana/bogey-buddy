@@ -55,9 +55,9 @@ export function CurrentOffGreen() {
     });
   };
 
-  const actual = (shotInformation.actualShotResult || {}) as StandardShot;
-  const intended = (shotInformation.intendedShotResult ||
-    {}) as Partial<BaseStandardShot>;
+  const actual = shotInformation.actualShotResult as StandardShot;
+  const intended =
+    shotInformation.intendedShotResult as Partial<BaseStandardShot>;
 
   return (
     <div className="w-full space-y-6">
@@ -67,6 +67,7 @@ export function CurrentOffGreen() {
           <Label>Lie Condition</Label>
           <Select
             onValueChange={(value) => handleInputChange("lieCondition", value)}
+            defaultValue={shotInformation.lieCondition}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Lie" />
@@ -85,6 +86,7 @@ export function CurrentOffGreen() {
           <Label>Shot type</Label>
           <Select
             onValueChange={(value) => handleInputChange("shotType", value)}
+            defaultValue={shotInformation.shotType}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Shot type" />
@@ -102,10 +104,10 @@ export function CurrentOffGreen() {
         <div className="flex flex-col gap-2 items-center ">
           <Label>Swing Type</Label>
           <Select
-            // onValueChange={(value) => handleInputChange("swingType", value)}
             onValueChange={(value) =>
               handleIntendedShotChange("swingType", value)
             }
+            defaultValue={intended.swingType}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Swing Type" />
@@ -126,6 +128,7 @@ export function CurrentOffGreen() {
             onValueChange={(value) =>
               handleIntendedShotChange("elevationChange", value)
             }
+            defaultValue={intended.elevationChange}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Elevation" />
