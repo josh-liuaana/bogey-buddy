@@ -92,7 +92,7 @@ export function CurrentOnGreen() {
                 shotPlan,
               "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
                 !shotPlan,
-            },
+            }
           )}
         >
           Shot Plan
@@ -106,7 +106,7 @@ export function CurrentOnGreen() {
                 !shotPlan,
               "bg-dune-sand text-deep-bg-deep-forest shadow-none border border-deep-forest":
                 shotPlan,
-            },
+            }
           )}
         >
           Result
@@ -130,7 +130,7 @@ export function CurrentOnGreen() {
             value={
               intended.pace && intended.read
                 ? `${intended.pace}-${intended.read}`
-                : undefined
+                : ""
             }
           >
             {paceOptions.map((pace) =>
@@ -152,7 +152,7 @@ export function CurrentOnGreen() {
                     </Label>
                   </div>
                 );
-              }),
+              })
             )}
           </RadioGroup>
         </div>
@@ -182,7 +182,7 @@ export function CurrentOnGreen() {
                     className={cn(
                       "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
                       "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
-                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest"
                     )}
                   >
                     {missSide}
@@ -216,7 +216,7 @@ export function CurrentOnGreen() {
                     className={cn(
                       "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
                       "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
-                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest"
                     )}
                   >
                     {direction}
@@ -250,7 +250,7 @@ export function CurrentOnGreen() {
                     className={cn(
                       "flex items-center justify-center rounded-md border border-muted bg-background px-3 py-2 text-sm font-medium",
                       "peer-data-[state=checked]:bg-deep-forest peer-data-[state=checked]:text-dune-sand peer-data-[state=checked]:border-deep-forest",
-                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest",
+                      "peer-data-[state=unchecked]:bg-dune-sand peer-data-[state=unchecked]:text-deep-forest peer-data-[state=unchecked]:border-deep-forest"
                     )}
                   >
                     {distance === "On Target" ? "True" : distance}
