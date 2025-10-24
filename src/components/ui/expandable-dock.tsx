@@ -88,7 +88,7 @@ export const ExpandableDock = ({
         }}
         className={cn(
           "backdrop-blur-lg overflow-hidden flex flex-col-reverse mx-auto",
-          className
+          className,
         )}
       >
         <div

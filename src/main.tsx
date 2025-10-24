@@ -8,6 +8,7 @@ import { App } from "./App.tsx";
 import { AuthProvider } from "./contexts/AuthContext.tsx";
 import { CourseProvider } from "./contexts/CourseContext.tsx";
 import { RoundProvider } from "./contexts/RoundContext.tsx";
+import { StatisticsProvider } from "./contexts/StatisticsContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")!).render(
       <AuthProvider>
         <CourseProvider>
           <RoundProvider>
-            <App />
+            <StatisticsProvider>
+              <App />
+            </StatisticsProvider>
           </RoundProvider>
         </CourseProvider>
       </AuthProvider>
