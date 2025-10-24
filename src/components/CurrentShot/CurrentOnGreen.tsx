@@ -15,7 +15,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useRound } from "@/contexts/RoundContext";
-import { cn } from "@/lib/utils";
 import {
   type BasePutt,
   directionToTargets,
@@ -25,6 +24,7 @@ import {
   type Putt,
   type Read,
 } from "@/types/roundData";
+import { cn } from "@/utils/classMerge";
 
 import { Button } from "../ui/button";
 
@@ -130,7 +130,7 @@ export function CurrentOnGreen() {
             value={
               intended.pace && intended.read
                 ? `${intended.pace}-${intended.read}`
-                : undefined
+                : ""
             }
           >
             {paceOptions.map((pace) =>

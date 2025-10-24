@@ -11,7 +11,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useRound } from "@/contexts/RoundContext";
-import { cn } from "@/lib/utils";
 import {
   ballFlights,
   ballShapes,
@@ -25,6 +24,7 @@ import {
   type StandardShot,
   swingTypes,
 } from "@/types/roundData";
+import { cn } from "@/utils/classMerge";
 
 export function CurrentOffGreen() {
   const { updateShotData, shotInformation } = useRound();

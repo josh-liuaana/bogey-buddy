@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { cn } from "../../lib/utils";
+import { cn } from "@/utils/classMerge";
 
 interface ExpandableDockProps {
   headerContent: ReactNode;

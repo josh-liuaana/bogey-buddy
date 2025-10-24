@@ -6,10 +6,10 @@ import {
 } from "firebase/firestore";
 import { createContext, useContext, useEffect, useState } from "react";
 
+import { db } from "@/lib/firebase";
 import type { Course, CourseWithId } from "@/types/course";
 import { log } from "@/utils/logger";
 
-import { db } from "../../firebase";
 import { useAuth } from "./AuthContext";
 
 interface CourseContextType {
