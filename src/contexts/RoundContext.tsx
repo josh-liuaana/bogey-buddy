@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 
+import { db } from "@/lib/firebase";
 import type { CurrentRound } from "@/types/course";
 import type {
   IntendedShotData,
@@ -21,7 +22,6 @@ import type {
 } from "@/types/roundData";
 import { log } from "@/utils/logger";
 
-import { db } from "../../firebase";
 import {
   clearLocalStorageState,
   loadLocalStorageState,

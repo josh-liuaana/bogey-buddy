@@ -5,9 +5,8 @@ import { TiThMenu } from "react-icons/ti";
 import { useNavigate } from "react-router-dom";
 
 import { ExpandableDock } from "@/components/ui/expandable-dock";
+import { app } from "@/lib/firebase";
 import { log } from "@/utils/logger";
-
-import { app } from "../../../firebase";
 
 export function Navbar() {
   const navigate = useNavigate();
