@@ -1,17 +1,33 @@
+import { lazy, Suspense } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthGate } from "@/components/AuthGate";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/contexts/AuthContext";
-import { CurrentRound } from "@/pages/CurrentRound";
-import { Home } from "@/pages/Home";
-import { Login } from "@/pages/Login";
-import { Profile } from "@/pages/Profile";
-import { RoundSetup } from "@/pages/RoundSetup";
-import { RoundSummary } from "@/pages/RoundSummary";
-import { Statistics } from "@/pages/Statistics";
 
 import { log } from "./utils/logger";
+
+const Home = lazy(() =>
+  import("@/pages/Home").then((m) => ({ default: m.Home }))
+);
+const Login = lazy(() =>
+  import("@/pages/Login").then((m) => ({ default: m.Login }))
+);
+const Profile = lazy(() =>
+  import("@/pages/Profile").then((m) => ({ default: m.Profile }))
+);
+const Statistics = lazy(() =>
+  import("@/pages/Statistics").then((m) => ({ default: m.Statistics }))
+);
+const CurrentRound = lazy(() =>
+  import("@/pages/CurrentRound").then((m) => ({ default: m.CurrentRound }))
+);
+const RoundSetup = lazy(() =>
+  import("@/pages/RoundSetup").then((m) => ({ default: m.RoundSetup }))
+);
+const RoundSummary = lazy(() =>
+  import("@/pages/RoundSummary").then((m) => ({ default: m.RoundSummary }))
+);
 
 function PrivateRoute() {
   const { user } = useAuth();
@@ -49,31 +65,35 @@ function PublicRoute() {
 
 export function App() {
   return (
-    <Routes>
-      <Route
-        element={
-          <AuthGate>
-            <PublicRoute />
-          </AuthGate>
-        }
-      >
-        <Route path="/login" element={<Login />} />
-      </Route>
+    <Suspense fallback={<div>Loading Application...</div>}>
+      <Routes>
+        <Route
+          element={
+            <AuthGate>
+              <PublicRoute />
+            </AuthGate>
+          }
+        >
+          {/* Use the lazy-loaded components */}
+          <Route path="/login" element={<Login />} />
+        </Route>
 
-      <Route
-        element={
-          <AuthGate>
-            <PrivateRoute />
-          </AuthGate>
-        }
-      >
-        <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/statistics" element={<Statistics />} />
-        <Route path="/round-setup" element={<RoundSetup />} />
-        <Route path="/current-round" element={<CurrentRound />} />
-        <Route path="/round-summary" element={<RoundSummary />} />
-      </Route>
-    </Routes>
+        <Route
+          element={
+            <AuthGate>
+              <PrivateRoute />
+            </AuthGate>
+          }
+        >
+          {/* Use the lazy-loaded components */}
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/statistics" element={<Statistics />} />
+          <Route path="/round-setup" element={<RoundSetup />} />
+          <Route path="/current-round" element={<CurrentRound />} />
+          <Route path="/round-summary" element={<RoundSummary />} />
+        </Route>
+      </Routes>
+    </Suspense>
   );
 }
