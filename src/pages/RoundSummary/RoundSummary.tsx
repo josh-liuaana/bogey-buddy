@@ -3,10 +3,11 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import { useStatistics } from "@/contexts/StatisticsContext.tsx";
-import { analyseGolfData, type GolfAnalysis } from "@/lib/genaiClient.ts";
+// import { analyseGolfData, type GolfAnalysis } from "@/lib/genaiClient.ts";
 import type { RoundData } from "@/types/roundData.ts";
 import { calculateRoundStatistics } from "@/utils/dataAnalysis";
-import { EXAMPLE_ANALYSIS_RESPONSE } from "@/utils/genaiPrompt";
+
+// !!! Currently genai analysis is disabled !!! //
 
 export function RoundSummary() {
   const user = getAuth().currentUser;
@@ -16,17 +17,16 @@ export function RoundSummary() {
 
   const [roundData, setRoundData] = useState<RoundData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [genaiAnalysis, setGenaiAnalysis] = useState<
-    GolfAnalysis | string | null
-  >(null);
+  // const [genaiAnalysis, setGenaiAnalysis] = useState<
+  //   GolfAnalysis | string | null
+  // >(null);
   const [roundStats, setRoundStats] = useState<any>(null); // To come from calculateRoundStatistics utils
 
-  // TODO Calculate round stats
   useEffect(() => {
     const fetchAndAnalyseRoundData = async () => {
       const data = await getUserSingleRoundStatistics(
         firebaseId,
-        user?.uid || "",
+        user?.uid || ""
       );
 
       const roundStatistics = calculateRoundStatistics(data as RoundData);
@@ -35,11 +35,11 @@ export function RoundSummary() {
 
       if (data) {
         setRoundData(data);
-        const dataJsonString = JSON.stringify(data, null, 2);
-        const genaiAnalysisResponse = await analyseGolfData(dataJsonString);
-        setGenaiAnalysis(genaiAnalysisResponse);
+        // const dataJsonString = JSON.stringify(data, null, 2);
+        // const genaiAnalysisResponse = await analyseGolfData(dataJsonString);
+        // setGenaiAnalysis(genaiAnalysisResponse);
       } else {
-        setGenaiAnalysis("No analysis available.");
+        // setGenaiAnalysis("No analysis available.");
       }
 
       setLoading(false);
@@ -70,27 +70,31 @@ export function RoundSummary() {
       </p>
       <p>Greens in Regulation: {roundData.greensInRegulation}</p>
 
-      {!loading && genaiAnalysis && (
+      {/* {!loading && genaiAnalysis && (
         <div className="border rounded-lg p-6 m-6 flex flex-col gap-2 items-center">
           <h3 className="text-xl">Summary</h3>
 
-          <p>{EXAMPLE_ANALYSIS_RESPONSE.summary}</p>
+          {typeof genaiAnalysis !== "string" && (
+            <>
+              <p>{genaiAnalysis?.summary}</p>
 
-          <h3>Strengths</h3>
-          {EXAMPLE_ANALYSIS_RESPONSE.strengths.map((strength, index) => (
-            <p key={index}>✅ {strength}</p>
-          ))}
+              <h3>Strengths</h3>
+              {genaiAnalysis?.strengths.map((strength, index) => (
+                <p key={index}>✅ {strength}</p>
+              ))}
 
-          <h3>Weaknesses</h3>
-          {EXAMPLE_ANALYSIS_RESPONSE.weaknesses.map((weakness, index) => (
-            <p key={index}>⚠️ {weakness}</p>
-          ))}
+              <h3>Weaknesses</h3>
+              {genaiAnalysis?.weaknesses.map((weakness, index) => (
+                <p key={index}>⚠️ {weakness}</p>
+              ))}
+            </>
+          )}
 
           <p className="text-xs">created with genai - can make mistakes</p>
         </div>
       )}
 
-      {!loading && !genaiAnalysis && <p>Analysis could not be generated.</p>}
+      {!loading && !genaiAnalysis && <p>Analysis could not be generated.</p>} */}
     </div>
   );
 }
